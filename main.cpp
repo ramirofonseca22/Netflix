@@ -3,6 +3,7 @@
 #include <sstream>
 #include <cstring>
 #include <cstdlib>
+#include <cctype>
 
 const int MAX_PELICULAS = 100;
 
@@ -27,7 +28,7 @@ int cargarPeliculas(const char* archivoNombre, Pelicula peliculas[]) {
 
         std::getline(ss, campo, ',');
         strncpy(peliculas[cantidad].titulo, campo.c_str(), sizeof(peliculas[cantidad].titulo));
-        
+
         std::getline(ss, campo, ',');
         peliculas[cantidad].anio = std::atoi(campo.c_str());
 
@@ -43,30 +44,56 @@ int cargarPeliculas(const char* archivoNombre, Pelicula peliculas[]) {
     return cantidad;
 }
 
+// Función auxiliar para convertir texto a minúsculas
+void toLower(char* str) {
+    for (; *str; ++str) *str = std::tolower(*str);
+}
+
 void buscarPorTitulo(Pelicula peliculas[], int cantidad, const char* consulta) {
     bool encontrado = false;
 
-    //TODO modificar para que encuentre ingresando solo parte del titulo
-
+    // TODO: modificar para que encuentre ingresando solo parte del titulo
     for (int i = 0; i < cantidad; ++i) {
-        if (strstr(peliculas[i].titulo, consulta)) {
+        char tituloLower[100];
+        char consultaLower[100];
+        strncpy(tituloLower, peliculas[i].titulo, sizeof(tituloLower));
+        strncpy(consultaLower, consulta, sizeof(consultaLower));
+        toLower(tituloLower);
+        toLower(consultaLower);
+
+        if (strstr(tituloLower, consultaLower)) {
             std::cout << peliculas[i].titulo << " (" << peliculas[i].anio << ", "
                       << peliculas[i].pais << ") - Reproducciones: "
                       << peliculas[i].reproducciones << "\n";
             encontrado = true;
         }
     }
+
     if (!encontrado) {
         std::cout << "No se encontraron coincidencias.\n";
     }
 }
 
 void ordenarPorReproducciones(Pelicula peliculas[], int cantidad) {
-//TODO implementar ordenamiento
+    // TODO: implementar ordenamiento
+    for (int i = 0; i < cantidad - 1; ++i) {
+        for (int j = 0; j < cantidad - i - 1; ++j) {
+            if (peliculas[j].reproducciones < peliculas[j + 1].reproducciones) {
+                std::swap(peliculas[j], peliculas[j + 1]);
+            }
+        }
+    }
 }
 
 void ordenarPorTitulo(Pelicula peliculas[], int cantidad) {
-    //TODO implementar ordenamiento
+    // TODO: implementar ordenamiento
+    for (int i = 0; i < cantidad - 1; ++i) {
+        for (int j = 0; j < cantidad - i - 1; ++j) {
+            if (strcasecmp(peliculas[j].titulo, peliculas[j + 1].titulo) > 0) {
+                std::swap(peliculas[j], peliculas[j + 1]);
+            }
+        }
+    }
 }
 
 void mostrarPeliculas(Pelicula peliculas[], int cantidad) {
@@ -114,3 +141,4 @@ int main() {
 
     return 0;
 }
+
